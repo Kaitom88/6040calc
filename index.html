@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="60/40 Calc">
+  <meta name="theme-color" content="#185FA5">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <title>60/40 Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      background: #F1F5F9; color: #1E293B; min-height: 100vh;
+      padding: max(env(safe-area-inset-top), 1.5rem) max(env(safe-area-inset-right), 1rem) max(env(safe-area-inset-bottom), 3rem) max(env(safe-area-inset-left), 1rem);
+      -webkit-text-size-adjust: 100%;
+    }
+    .wrap { max-width: 600px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 1.75rem; }
+    .icon-circle { width: 64px; height: 64px; background: #185FA5; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-size: 32px; }
+    h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .sub { font-size: 16px; color: #64748B; }
+    .card { background: #fff; border: 1px solid #E2E8F0; border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; }
+    .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+    .card-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .card-label { font-size: 17px; font-weight: 600; }
+    .field-label { font-size: 12px; color: #94A3B8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .input-wrap { position: relative; }
+    .input-wrap input {
+      width: 100%; padding: 15px 68px 15px 18px;
+      font-size: 18px; font-weight: 600;
+      border-radius: 14px; border: 2px solid #E2E8F0;
+      background: #F8FAFC; color: #1E293B;
+      outline: none; font-family: inherit;
+      -webkit-appearance: none; appearance: none;
+      caret-color: #185FA5;
+    }
+    .input-wrap input:focus { border-color: #378ADD; box-shadow: 0 0 0 4px rgba(55,138,221,0.15); background: #fff; }
+    .input-wrap input::-webkit-outer-spin-button,
+    .input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .unit { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #94A3B8; pointer-events: none; font-weight: 700; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .rbox { padding: 12px 14px; border-radius: 12px; }
+    .rlbl { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+    .rnum { font-size: 20px; font-weight: 700; }
+    .mrow { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; background: #F8FAFC; border-radius: 12px; margin-top: 10px; border: 1px solid #E2E8F0; }
+    .mrow span:first-child { font-size: 14px; color: #64748B; }
+    .mrow span:last-child { font-size: 18px; font-weight: 700; color: #1E293B; }
+    .rfull { display: flex; justify-content: space-between; align-items: center; padding: 15px 18px; border-radius: 14px; margin-top: 10px; }
+    .rfull-lbl { font-size: 15px; font-weight: 600; }
+    .rfull-num { font-size: 22px; font-weight: 700; }
+    .info { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 14px; margin-bottom: 1rem; }
+    .info p { font-size: 14px; color: #1D4ED8; line-height: 1.65; }
+    .watermark { text-align: center; font-size: 13px; color: #94A3B8; padding: 0.5rem 0 0; letter-spacing: 0.03em; }
+    /* iPad landscape */
+    @media (min-width: 700px) {
+      .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .card { margin-bottom: 0; }
+      .card-full { grid-column: 1 / -1; }
+    }
+    /* Install banner */
+    #install-banner { display: none; align-items: center; justify-content: space-between; gap: 12px; background: #185FA5; color: #fff; border-radius: 14px; padding: 12px 16px; margin-bottom: 1rem; font-size: 14px; }
+    #install-banner button { background: #fff; color: #185FA5; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    #install-banner .close-btn { background: none; color: #fff; border: none; font-size: 20px; cursor: pointer; padding: 0 4px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Install banner (shows on supported browsers) -->
+  <div id="install-banner">
+    <span>📲 เพิ่มไปที่หน้าจอหลักเพื่อใช้แบบแอป</span>
+    <button id="install-btn">ติดตั้ง</button>
+    <button class="close-btn" id="close-banner">✕</button>
+  </div>
+
+  <div class="header">
+    <div class="icon-circle">🧮</div>
+    <h1>60/40 Calculator</h1>
+    <p class="sub">คำนวณสิทธิคนละครึ่งและงบประมาณ</p>
+  </div>
+
+  <div class="cards-grid">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon" style="background:#EFF6FF;">🪙</div>
+        <span class="card-label">จากราคาอาหารเต็ม</span>
+      </div>
+      <div class="field-label">* ราคาอาหารทั้งหมด</div>
+      <div class="input-wrap">
+        <input type="number" inputmode="decimal" id="food" placeholder="0.00" min="0" step="any" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <span class="unit">THB</span>
+      </div>
+      <div class="grid2">
+        <div class="rbox" style="background:#EFF6FF;">
+          <div class="rlbl" style="color:#185FA5;">รัฐช่วย (60%)</div>
+          <div class="rnum" style="color:#0C447C;" id="food-gov">0.00</div>
+        </div>
+        <div class="rbox" style="background:#FFF7ED;">
+          <div class="rlbl" style="color:#C2410C;">เราจ่าย (40%)</div>
+          <div class="rnum" style="color:#9A3412;" id="food-us">0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon" style="background:#F0FDF4;">👛</div>
+        <span class="card-label">จากสิทธิคงเหลือ</span>
+      </div>
+      <div class="field-label">* สิทธิที่เหลืออยู่ในแอป</div>
+      <div class="input-wrap">
+        <input type="number" inputmode="decimal" id="subsidy" placeholder="0.00" min="0" step="any" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <span class="unit">THB</span>
+      </div>
+      <div class="mrow"><span>ต้องเติมเงินเพิ่ม (40%)</span><span id="sub-top">0.00</span></div>
+      <div class="rfull" style="background:#15803D;">
+        <span class="rfull-lbl" style="color:#DCFCE7;">ยอดที่ซื้อของได้สูงสุด</span>
+        <span class="rfull-num" style="color:#fff;" id="sub-total">0.00</span>
+      </div>
+    </div>
+
+    <div class="card card-full">
+      <div class="card-head">
+        <div class="card-icon" style="background:#F5F3FF;">💸</div>
+        <span class="card-label">จากงบประมาณที่มี</span>
+      </div>
+      <div class="field-label">* จำนวนเงินที่เราจะจ่าย</div>
+      <div class="input-wrap">
+        <input type="number" inputmode="decimal" id="spend" placeholder="0.00" min="0" step="any" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <span class="unit">THB</span>
+      </div>
+      <div class="mrow"><span>สิทธิที่จะได้รับ (60%)</span><span id="spend-gov">0.00</span></div>
+      <div class="rfull" style="background:#6D28D9;">
+        <span class="rfull-lbl" style="color:#EDE9FE;">มูลค่าของที่จะได้</span>
+        <span class="rfull-num" style="color:#fff;" id="spend-total">0.00</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:1rem;">
+    <div class="info">
+      <span style="font-size:20px;flex-shrink:0;">ℹ️</span>
+      <p>แก้ไขเฉพาะช่องที่มีเครื่องหมาย <strong>*</strong> ระบบจะคำนวณส่วนที่เหลือให้โดยอัตโนมัติแบบ Real-time</p>
+    </div>
+    <div class="watermark">Created with orrawan 2 &nbsp;·&nbsp; 60/40 Subsidy Calculator</div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // Calculator logic
+  function fmt(n) {
+    var num = parseFloat(n);
+    if (isNaN(num) || num < 0) num = 0;
+    return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function val(id) { var v = parseFloat(document.getElementById(id).value); return isNaN(v) ? 0 : v; }
+  function set(id, n) { document.getElementById(id).textContent = fmt(n); }
+  function bind(id, fn) {
+    var el = document.getElementById(id);
+    ['input','change','keyup'].forEach(function(ev){ el.addEventListener(ev, fn); });
+  }
+  bind('food', function(){ var n=val('food'); set('food-gov',n*0.6); set('food-us',n*0.4); });
+  bind('subsidy', function(){ var n=val('subsidy'); var t=n*(40/60); set('sub-top',t); set('sub-total',n+t); });
+  bind('spend', function(){ var n=val('spend'); var g=n*(60/40); set('spend-gov',g); set('spend-total',n+g); });
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  }
+
+  // PWA Install banner
+  var deferredPrompt;
+  var banner = document.getElementById('install-banner');
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    banner.style.display = 'flex';
+  });
+  document.getElementById('install-btn').addEventListener('click', function() {
+    if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+    banner.style.display = 'none';
+  });
+  document.getElementById('close-banner').addEventListener('click', function() {
+    banner.style.display = 'none';
+  });
+})();
+</script>
+</body>
+</html>
